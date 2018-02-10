@@ -20,8 +20,8 @@ import java.net.Socket;
 
 public class WirelessDataGatherer implements Runnable {
     private static String TAG = "WirelessDataGatherer";
-    private String severIp =   "192.168.1.51";
-    private int serverPort = 65432;
+    private String severIp = "192.168.4.1";
+    private int serverPort = 8888;
     private Socket connectionSocket;
     private Handler uitaskHandler;
     private boolean exit = false;
