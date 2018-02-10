@@ -10,9 +10,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends AppCompatActivity implements LocationListener, OnMapReadyCallback {
     private String TAG = "MainActivity";
     private TextView rpmValue;
     private TextView voltageValue;
@@ -25,6 +31,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private Thread wirelessDataGathererThread;
 
     private LocationManager locationManager;
+    private GoogleMap map;
+
+    private double lat = 0, lon= 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,14 +55,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, "onLocationChanged");
+        lat = location.getLatitude();
+        lon =  location.getLongitude();
         altitudeValue.setText(String.format(Locale.getDefault(), "%.1fm", location.getAltitude()));
-        longitudeValue.setText(String.format(Locale.getDefault(), "%.5f°", location.getLongitude()));
-        latitudeValue.setText(String.format(Locale.getDefault(), "%.5f°", location.getLatitude()));
+        longitudeValue.setText(String.format(Locale.getDefault(), "%.5f°", lon));
+        latitudeValue.setText(String.format(Locale.getDefault(), "%.5f°", lat));
     }
 
     @Override
@@ -68,5 +83,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     public void onProviderDisabled(String provider) {
         Log.d(TAG, "onProviderDisabled");
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        map = googleMap;
+        map.setMyLocationEnabled(true);
     }
 }
