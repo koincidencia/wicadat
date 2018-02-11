@@ -14,6 +14,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -35,8 +36,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private GoogleMap map;
 
     private double lat = 0, lon= 0;
-
-    boolean positionLocked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +69,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         altitudeValue.setText(String.format(Locale.getDefault(), "%.1fm", location.getAltitude()));
         longitudeValue.setText(String.format(Locale.getDefault(), "%.5f°", lon));
         latitudeValue.setText(String.format(Locale.getDefault(), "%.5f°", lat));
-        if (!positionLocked) {
-            positionLocked = true;
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 16));
-        }
+        CameraPosition cameraPosition = map.getCameraPosition();
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), cameraPosition.zoom));
     }
 
     @Override
@@ -96,5 +93,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         map = googleMap;
         map.setTrafficEnabled(true);
         map.setMyLocationEnabled(true);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(47.5, 19), 16));
     }
 }
