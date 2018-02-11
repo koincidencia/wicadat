@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
     private double lat = 0, lon= 0;
 
+    boolean positionLocked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         altitudeValue.setText(String.format(Locale.getDefault(), "%.1fm", location.getAltitude()));
         longitudeValue.setText(String.format(Locale.getDefault(), "%.5f°", lon));
         latitudeValue.setText(String.format(Locale.getDefault(), "%.5f°", lat));
+        if (!positionLocked) {
+            positionLocked = true;
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 16));
+        }
     }
 
     @Override
@@ -88,6 +94,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        map.setTrafficEnabled(true);
         map.setMyLocationEnabled(true);
     }
 }
