@@ -6,7 +6,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -42,19 +44,28 @@ public class WirelessDataGatherer implements Runnable {
                 connect();
                 // Receive data
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connectionSocket.getOutputStream()));
                 connectionSocket.setSoTimeout(10000);
-                while(!exit) {
+                while(!connectionSocket.isClosed()) {
+                    writer.write("Szia\r");
+                    writer.flush();
                     String unparsedData = reader.readLine();
-                    Log.d(TAG, unparsedData);
-                    Runnable showData = new WirelessDataUpdater(unparsedData, textViews);
-                    uitaskHandler.post(showData);
+                    if(unparsedData != null) {
+                        Runnable showData = new WirelessDataUpdater(unparsedData, textViews);
+                        uitaskHandler.post(showData);
+                    } else {
+                        //Thread.sleep(300);
+                        //throw new Exception("Invalid data in socket");
+                    }
                 }
             } catch (Exception e) {
                 Writer writer = new StringWriter();
                 e.printStackTrace(new PrintWriter(writer));
                 String s = writer.toString();
                 Log.e(TAG, s);
+            } finally {
                 Log.d(TAG, "Disconnected.");
+                try {Thread.sleep(1000);} catch (Exception excp) {}
             }
         }
     }
@@ -65,5 +76,4 @@ public class WirelessDataGatherer implements Runnable {
         connectionSocket.connect(new InetSocketAddress(serverAddr, serverPort), 5000);
         Log.d(TAG, "Connected! ");
     }
-
 }
